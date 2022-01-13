@@ -15,6 +15,7 @@ import pathlib
 import time
 import json
 from torch.utils import data
+from torch.utils.tensorboard import SummaryWriter
 
 import settings as s
 import utils
@@ -121,7 +122,9 @@ def main(settings):
     logdir = os.path.join(settings['logdir'], settings['method'], settings['dataset'], utils.get_runname(settings))
     pathlib.Path(logdir).mkdir(parents=True, exist_ok=True)
 
-
+    # create the tensorboard writer
+    writer = SummaryWriter(log_dir=os.path.join('./runs', f"{settings['method']}_{settings['dataset']}_{utils.get_runname(settings)}"))
+    
     # prepare
     train_set = utils.dataset_from_name(split='train', **settings)
     val_set = utils.dataset_from_name(split='val', **settings)
@@ -169,6 +172,11 @@ def main(settings):
 
                 loss, sim  = stats if isinstance(stats, tuple) else (stats, 0)
                 print("Epoch {:03d}, batch {:03d}, train_loss {:.4f}, sim {:.4f}, rm train_loss {:.3f}, rm sim {:.3f}".format(e, b, loss, sim, rm1(loss), rm2(sim)))
+                n_iter = e * len(train_loader) + b
+                writer.add_scalar('Loss/train', loss, n_iter)
+                writer.add_scalar('sm/train', sim, n_iter)
+                writer.add_scalar('rm_loss/train', rm1(loss), n_iter)
+                writer.add_scalar('rm_sim/train', rm2(sim), n_iter)
             
             tock = time.time()
             elapsed_time += (tock - tick)
