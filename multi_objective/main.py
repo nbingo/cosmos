@@ -29,19 +29,23 @@ from scores import from_objectives
 
 def method_from_name(method, **kwargs):
     if method == 'ParetoMTL':
-        return ParetoMTLMethod(**kwargs)
+        model = ParetoMTLMethod(**kwargs)
     elif 'cosmos' in method:
-        return COSMOSMethod(**kwargs)
+        model = COSMOSMethod(**kwargs)
     elif method == 'SingleTask':
-        return SingleTaskMethod(**kwargs)
+        model = SingleTaskMethod(**kwargs)
     elif 'hyper' in method:
-        return HypernetMethod(**kwargs)
+        model = HypernetMethod(**kwargs)
     elif method == 'mgda':
-        return MGDAMethod(**kwargs)
+        model = MGDAMethod(**kwargs)
     elif method == 'uniform':
-        return UniformScalingMethod(**kwargs)
+        model = UniformScalingMethod(**kwargs)
     else:
         raise ValueError("Unkown method {}".format(method))
+    if (len(gpus) > 1) and (torch.cuda.device_count() > 1):
+        return torch.nn.DistributedDataParallel(model, device_ids=gpus)
+    else:
+        return model
 
 
 epoch_max = -1

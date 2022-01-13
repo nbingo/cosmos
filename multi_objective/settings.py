@@ -171,4 +171,7 @@ generic = dict(
 
     # Reference point for hyper-volume calculation
     reference_point=[2, 2],
+    
+    # which GPU(s) to use
+    gpus = [0]
 )
