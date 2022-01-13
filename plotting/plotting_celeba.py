@@ -21,7 +21,7 @@ from plotting_convergence import (
 
 dirname = "../results_plot/results_celeba/"
 
-scenario = 'mcr_10'
+scenario = 'easy'
 
 if scenario == 'easy':
     methods = ['cosmos_2_pf', 'SingleTask', ]
